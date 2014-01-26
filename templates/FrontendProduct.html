@@ -21,7 +21,7 @@
                     dataType: 'json',
                     data: $('#cart-form').serialize(),
                     success: function(data, textStatus, jqXHR) {
-                        if (data.data.opt_price > 0) {
+                        if (data.data.opt_price) {
                             $('.optprice_val').html(data.data.opt_price);
                         } else {
                             $('.optprice_val').html($('.add2cart .price').html());
