@@ -1,0 +1,132 @@
+<style type="text/css">
+    #wa .CodeMirror{
+        border: 1px solid #eee;
+    }
+    .CodeMirror-scroll {
+        height: auto;
+        overflow-y: hidden;
+        overflow-x: auto;
+    }
+    .cat_icon{
+        padding-left: 32px;
+    }
+</style>
+<h1>Оптовая цена</h1>
+<div class="fields form">
+    <form action="?plugin=optprice&action=save" method="post" id="plugins-settings-form">
+        {$wa->csrf()}
+
+        {literal}
+        <p>{shopOptpricePlugin::display($product.id)} - Код хелпера вывода, для размещение вывода плагина в произвольном месте</p>
+        <p>
+            {shopOptpricePlugin::getOptPrice($product_id, $sku_id, $contact_id)} - функция получения оптовой цены. Функция возвращает оптовую цену в основной валюте или FLASE в случаи ошибки, если пользователь не принадлежит к оптовым категориям.<br>
+            <br>
+            $product_id - обязательный параметр, идентификатор товара, для которого вычисляется оптовая цена.<br>
+            $sku_id - необязательный параметр, идентификатор артикула, для которого вычисляется оптовая цена. Если параметр не задан, возвращается оптовая цена для артикула по умолчанию.<br>
+            $contact_id - необязательный параметр, идентификатор покупателя, для которого вычисляется оптовая цена. Если параметр не задан, возвращается оптовая цена для текущего покупателя.<br>
+        </p>
+        {/literal}
+
+
+        <div class="field">
+            <div class="name">
+                Статус
+            </div>
+            <div class="value">
+                <select name="shop_optprice[status]">
+                    <option {if $settings.status == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.status == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Стандартный вывод в карточке товара
+            </div>
+            <div class="value">
+                <select name="shop_optprice[frontend_product]">
+                    <option {if $settings.frontend_product == 1} selected="selected"{/if} value="1">Включен</option>
+                    <option {if $settings.frontend_product == 0} selected="selected"{/if} value="0">Выключен</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">
+                Категории покупателей
+            </div>
+            <div class="value">
+                <ul class="menu-v with-icons collapsible" id="customer-categories">
+                    {foreach $categories as $c}
+                    <li data-category-id="{$c.id}">
+                        <input type="checkbox" {if isset($selected_categories[$c.id])}checked="checked"{/if} name="selected_categories[{$c.id}]" value="1"/>
+                               <span class="cat_icon">{$wa->shop->icon16($c.icon)}{$c.name|escape}</span>
+                    </li>
+                    {/foreach}
+                </ul>
+
+                <p class="hint">Категории пользователей, для который действует оптовая цена</p>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="name">Шаблон<br /><span class="hint">HTML + Smarty</span></div>
+            <div class="value no-shift">
+                <div id="s-editor-core-wrapper">
+                    <textarea id="sf-template" class="body" name="template">{$template|escape}</textarea>
+                </div>
+            </div>
+
+            {if $change_tpl}
+            <div class="value">
+                <p class="gray"><i class="icon16 exclamation"></i>Внимание! Шаблон по умолчанию был изменен</p>
+                <input type="checkbox" name="shop_optprice[reset_tpl]" value="1"  /> - Сбросить изменения, использовать шаблон по умолчанию
+            </div>
+            {/if}
+        </div>
+
+
+
+        <div class="field">
+            <div class="value submit">
+                <input type="submit" class="button green" value="Сохранить">
+                <span id="plugins-settings-form-status" style="display:none">
+                    <i style="vertical-align:middle" class="icon16 yes"></i> [`Saved`]
+                </span>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function() {
+        var c = CodeMirror.fromTextArea(document.getElementById('sf-template'), {
+            mode: "text/html",
+            tabMode: "indent",
+            height: "dynamic",
+            lineWrapping: true
+        });
+        $("#sf-template").change(function() {
+            c.setValue($(this).val())
+        });
+        $("#sf-settings").submit(function() {
+            var f = $(this);
+            $.post(f.attr('action'), f.serialize(), function(response) {
+                if (response.status == 'ok') {
+                    $('#wa-design-button').removeClass('red').addClass('green');
+                    $("#wa-editor-status-fail").hide()
+                    $("#wa-editor-status-ok span").html(response.data.message);
+                    $("#wa-editor-status-ok").fadeIn('slow', function() {
+                        $(this).fadeOut(1000);
+                    });
+                } else {
+                    $('#wa-design-button').removeClass('green').addClass('red');
+                    $("#wa-editor-status-ok").hide();
+                    $("#wa-editor-status-fail span").html(response.errors.join(', '));
+                    $("#wa-editor-status-fail").fadeIn('slow');
+                }
+            }, "json")
+            return false;
+        });
+    });
+</script>

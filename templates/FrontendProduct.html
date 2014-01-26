@@ -1,0 +1,36 @@
+<style>
+    .frontend_product_optprice{
+        color: #FF0000;
+        font-weight: bold;
+    }
+</style> 
+
+<span class="frontend_product_optprice">
+    <span class="title">Оптовая цена</span>
+    <span class="optprice_val">{shop_currency_html($opt_price)}</span>
+</span>
+
+<script>
+    $(function() {
+        var cur_price;
+        setInterval(function() {
+            if (cur_price != $('.add2cart .price').html()) {
+                $.ajax({
+                    type: 'POST',
+                    url: '{$wa_app_url}optprice/',
+                    dataType: 'json',
+                    data: $('#cart-form').serialize(),
+                    success: function(data, textStatus, jqXHR) {
+                        if (data.data.opt_price > 0) {
+                            $('.optprice_val').html(data.data.opt_price);
+                        } else {
+                            $('.optprice_val').html($('.add2cart .price').html());
+                        }
+
+                    }
+                });
+                cur_price = $('.add2cart .price').html();
+            }
+        }, 500);
+    });
+</script>
