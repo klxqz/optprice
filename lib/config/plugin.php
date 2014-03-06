@@ -5,8 +5,8 @@
  * @link http://wa-plugins.ru/
  */
 return array(
-    'name' => 'Оптовая цена',
-    'description' => 'Оптовая цена для каждого из товаров',
+    'name' => 'Скидка на товар',
+    'description' => 'Скидка на товара для выбранных групп пользователей',
     'vendor' => '985310',
     'version' => '1.0.0',
     'img' => 'img/optprice.png',
