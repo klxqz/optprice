@@ -28,12 +28,13 @@ class shopOptpricePluginSettingsAction extends waViewAction {
         } else {
             $template_path = wa()->getAppPath($this->tmp_path, 'shop');
         }
+        $selected_categories = isset($settings['selected_categories']) ? json_decode($settings['selected_categories'], true) : array();
         $template = file_get_contents($template_path);
         $this->view->assign('template', $template);
         $this->view->assign('change_tpl', $change_tpl);
         $this->view->assign('categories', $categories);
         $this->view->assign('settings', $settings);
-        $this->view->assign('selected_categories', json_decode($settings['selected_categories'], true));
+        $this->view->assign('selected_categories', $selected_categories);
     }
 
 }
